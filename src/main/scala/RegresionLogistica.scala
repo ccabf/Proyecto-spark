@@ -37,29 +37,9 @@ object RegresionLogistica {
     //df.printSchema()
     //df.show()
 
-/*
-    dfindex4.withColumn("Year", col("Year").cast("Double"))
-    dfindex4.withColumn("Month", col("Month").cast("Double"))
-    dfindex4.withColumn("Week", col("Week").cast("Double"))
-    dfindex4.withColumn("Avg household size", col("Avg household size").cast("Double"))
-    dfindex4.withColumn("Population", col("Population").cast("Double"))
-    dfindex4.withColumn("Under_18", col("Under_18").cast("Double"))
-    dfindex4.withColumn("18-24", col("18-24").cast("Double"))
-    dfindex4.withColumn("25-44", col("25-44").cast("Double"))
-    dfindex4.withColumn("45-64", col("45-64").cast("Double"))
-    dfindex4.withColumn("Above_65", col("Above_65").cast("Double"))
-    dfindex4.withColumn("Median_age", col("Median_age").cast("Double"))
-    dfindex4.withColumn("indexedCountry", col("indexedCountry").cast("Double"))
-    dfindex4.withColumn("indexedRegion", col("indexedRegion").cast("Double"))
-    dfindex4.withColumn("indexedDisease", col("indexedDisease").cast("Double"))
-    dfindex4.withColumn("Infected", col("Infected").cast("Double"))
-*/
-
-
     val featureCols = Array("Age","indexedGender","indexedCourse","indexedMarital","indexedAnx","indexedPan","indexedSpec","indexedYear","indexedCGPA")
     val assembler = new VectorAssembler().setInputCols(featureCols).setOutputCol("features")
     val df2 = assembler.transform(df_log)
-
 
 
     /**
@@ -67,11 +47,11 @@ object RegresionLogistica {
      *  FNDX is the 1 or 0 indicator that shows whether the patient has cancer.
      * Like the VectorAssembler it will add another column to the dataframe.
      */
-    val labelIndexer = new StringIndexer().setInputCol("indexedDepr").setOutputCol("label")
-    val df3 = labelIndexer.fit(df2).transform(df2)
+    //val labelIndexer = new StringIndexer().setInputCol("indexedDepr").setOutputCol("label")
+    //val df3 = labelIndexer.fit(df2).transform(df2)
 
-    val model = new LogisticRegression().fit(df3)
-    val predictions = model.transform(df3)
+    val model = new LogisticRegression().setLabelCol("indexedDepr").fit(df2)
+    val predictions = model.transform(df2)
 
     /**
      *  Now we print it out.  Notice that the LR algorithm added a “prediction” column
@@ -82,16 +62,16 @@ object RegresionLogistica {
      *  You could use the BinaryClassificationEvaluator Spark ML function to do that.
      * Adding that would be a good exercise for you, the reader.
      */
-    //predictions.select ("features", "label", "prediction").show(200)
+    predictions.select ("features", "indexedDepr", "prediction").show()
 
 
-    val lp = predictions.select( "label", "prediction")
+    val lp = predictions.select( "indexedDepr", "prediction")
     val counttotal = predictions.count()
-    val correct = lp.filter(col ("label") === col ("prediction")).count()
-    val wrong = lp.filter(not(col ("label") === col ("prediction"))).count()
-    val truep = lp.filter(col("prediction") === 0.0).filter(col ("label") === col ("prediction")).count()
-    val falseN = lp.filter(col("prediction") === 0.0).filter(not(col ("label") === col ("prediction"))).count()
-    val falseP = lp.filter(col("prediction") === 1.0).filter(not(col ("label") === col ("prediction"))).count()
+    val correct = lp.filter(col ("indexedDepr") === col ("prediction")).count()
+    val wrong = lp.filter(not(col ("indexedDepr") === col ("prediction"))).count()
+    val truep = lp.filter(col("prediction") === 0.0).filter(col ("indexedDepr") === col ("prediction")).count()
+    val falseN = lp.filter(col("prediction") === 0.0).filter(not(col ("indexedDepr") === col ("prediction"))).count()
+    val falseP = lp.filter(col("prediction") === 1.0).filter(not(col ("indexedDepr") === col ("prediction"))).count()
     val ratioWrong=wrong.toDouble/counttotal.toDouble
     val ratioCorrect=correct.toDouble/counttotal.toDouble
 
