@@ -78,6 +78,8 @@ object RegresionLogistica {
     println("ratioWrong: "+ ratioWrong)
     println("ratioCorrect: "+ ratioCorrect)
 
+    model.save("/Users/hubsantander/Desktop/Scala")
+
 
   }
 

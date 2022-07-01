@@ -60,6 +60,8 @@ object LinearRegresion {
     println(s"RMSE: ${trainingSummary.rootMeanSquaredError}")
     println(s"r2: ${trainingSummary.r2}")
 
+    lrModel.save("/Users/hubsantander/Desktop/Scala")
+
 
   }
 
